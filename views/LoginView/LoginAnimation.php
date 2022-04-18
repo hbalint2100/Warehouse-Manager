@@ -1,0 +1,3 @@
+<div class="center">
+    <div class="loader"></div>
+</div>
