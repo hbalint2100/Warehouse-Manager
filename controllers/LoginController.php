@@ -52,6 +52,16 @@ class LoginController extends BaseController
         }
     }
 
+    public function logout()
+    {
+        if(self::loggedIn())
+        {
+            session_destroy();
+        }
+        header('Location: /',true,303);
+        exit;
+    }
+
     public static function loggedIn()
     {
         return isset($_SESSION[self::KEY_LOGINSUCCESS])&&isset($_SESSION[self::KEY_USERID])&&$_SESSION[LoginController::KEY_LOGINSUCCESS]==true;

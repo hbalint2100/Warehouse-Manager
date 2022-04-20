@@ -25,6 +25,19 @@ CREATE TABLE Products(
     Category NVARCHAR(255),
     ProductName NVARCHAR(255) NOT NULL,
     NetPrice DECIMAL(12,3) NOT NULL,
-    GrossPrice DECIMAL(12,3),
-    Amount INT UNSIGNED
+    GrossPrice DECIMAL(12,3)
+);
+
+CREATE TABLE Warehouses(
+    WarehouseID INT PRIMARY KEY AUTO_INCREMENT,
+    WarehouseName NVARCHAR(255) UNIQUE NOT NULL,
+    AdditionalDetails NVARCHAR(255)
+);
+
+CREATE TABLE Stocks(
+    WarehouseID INT NOT NULL,
+    ProductID INT NOT NULL,
+    Amount INT UNSIGNED,
+    FOREIGN KEY(ProductID) REFERENCES Products(ProductID),
+    FOREIGN KEY(WarehouseID) REFERENCES Warehouses(WarehouseID)
 );
