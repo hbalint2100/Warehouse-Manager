@@ -22,7 +22,8 @@ class Router
 
     public function resolve(string $request,string $method)
     {
-        $route = explode('?',$request)[0];
+        $requestArray = explode('?',$request);
+        $route = $requestArray[0];
         $action = $this->routes[$route][$method] ?? null;
         if(!$action||!is_array($action))
         {
@@ -32,8 +33,13 @@ class Router
         if(class_exists($class))
         {
             $object = new $class;
+
             if(method_exists($object,$fun))
             {
+                if(count($requestArray)>1&&!is_null($requestArray[1]) &&$object instanceof BaseController)
+                {
+                    $object->setParams($requestArray[1]);
+                }
                 call_user_func_array([$object,$fun],[]);
             }
         }

@@ -1,6 +1,6 @@
 @import url(//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css);
 
-.container{
+.container-main{
     padding: 0;
     margin: 0;
 	height: 100vh;
@@ -23,6 +23,7 @@ body{
     z-index: 9999; 
 }
 	.left ul{
+		margin-top: 50px;
 		padding: 0;
 		list-style-type: none;
 		text-align: left;
@@ -41,11 +42,11 @@ body{
         width: 250px; 
     }  
 
-		.left .item-menu {
-	        height:50px;
-	        overflow:hidden;
-	        color:#fff;
-	    }  
+	.left .item-menu {
+	    height:50px;
+	    overflow:hidden;
+	    color:#fff;
+	}  
 	.left a{
 		color: white;
 	    text-decoration: none;
@@ -64,5 +65,27 @@ body{
 		position: absolute;
 		left: 50px;
 		height: 100vh;
-		width: calc(100vh-50px);
+		width: calc(100vw - 50px);
+	}
+
+	.right .title{
+		padding: 1vh;
+		text-align: center;
+		background-color: #214a80;
+		height: 50px;
+	}
+
+	.right .title h1{
+		margin: 0;
+		color: white;
+		display: inline-block;
+	}
+
+	.right .container-fluid{
+		margin-left: 3vw;
+		width: 90%;
+	}
+
+	.right .container-fluid .table{
+		max-width: 500px;
 	}

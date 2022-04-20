@@ -8,12 +8,9 @@ class BaseController
     private ?string $description = null;
     private ?string $bodyPath = null;
     private ?string $styleSheetPath = null;
+    private ?string $params = null;
     
 
-    protected function bootStrapActive()
-    {
-        return $this->bootStrap;
-    }
     protected function getTitle()
     {
         return $this->title;
@@ -64,5 +61,15 @@ class BaseController
     public function index()
     {
         $this->show();
+    }
+
+    public function setParams(string $i_params)
+    {
+        $this->params = $i_params;
+    }
+
+    protected function getParams()
+    {
+        return $this->params;
     }
 }

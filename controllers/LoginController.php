@@ -5,6 +5,7 @@ class LoginController extends BaseController
 {
     public const KEY_LOGINSUCCESS = 'loginSuccess';
     public const KEY_USERID = 'userID';
+    private const KEY_ADMIN = 'admin';
 
     public function getLoginSuccess()
     {
@@ -47,6 +48,7 @@ class LoginController extends BaseController
         {
             $_SESSION[self::KEY_LOGINSUCCESS] = true;
             $_SESSION[self::KEY_USERID] = $user->getUserID();
+            $_SESSION[self::KEY_ADMIN] = $user->getPriviligeLevel() === PrivilegeLevels::ADMIN;
             header("Refresh:3; url= /warehouse",true,303);
             exit;
         }
@@ -60,6 +62,16 @@ class LoginController extends BaseController
         }
         header('Location: /',true,303);
         exit;
+    }
+
+    public static function isAdmin()
+    {
+        return $_SESSION[self::KEY_ADMIN]?? false;
+    }
+
+    public static function getUserID()
+    {
+        return $_SESSION[self::KEY_USERID]?? null;
     }
 
     public static function loggedIn()

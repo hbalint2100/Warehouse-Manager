@@ -56,6 +56,10 @@ class User
 
     public static function loadUser(string $i_username,string $i_password)
     {
+        if(is_null($i_username)||is_null($i_password))
+        {
+            return null;
+        }
         $db = DB::getInstance();
         $query = $db->prepare('SELECT * FROM '.self::USERTABLE.' WHERE '.self::USERNAME.'=:username');
         $query->bindParam(':username',$i_username);
@@ -67,6 +71,7 @@ class User
         }
         else if(self::isUserTableEmpty())
         {
+            //default user
             return self::registerUser('admin','admin',PrivilegeLevels::ADMIN);
         }
         return null;
@@ -74,6 +79,10 @@ class User
 
     public static function registerUser(string $i_username,string $i_password,PrivilegeLevels $i_privilegeLevel)
     {
+        if(is_null($i_username)||is_null($i_password)||is_null($i_privilegeLevel))
+        {
+            return null;
+        }
         $i_hashPassword = password_hash($i_password,PASSWORD_DEFAULT);
         $db = DB::getInstance();
         $query = $db->prepare('INSERT INTO '.self::USERTABLE.' ('.self::USERNAME.','.self::PASSWORD.','.self::PRIVILIGELEVEL.') VALUES (:username,:password,:priviligelevel)');
@@ -84,6 +93,24 @@ class User
         $query->execute();
         $id = (int) $db->lastInsertId();
         return new User($id,$i_username,$i_hashPassword,$i_privilegeLevel);
+    }
+
+    public static function getUserByID(int $i_userId)
+    {
+        if(is_null($i_userId))
+        {
+            return null;
+        }
+        $db = DB::getInstance();
+        $query = $db->prepare('SELECT * FROM '.self::USERTABLE.' WHERE '.self::USERID.'=:userid');
+        $query->bindParam(':userid',$i_userId);
+        $query->execute();
+        $user = $query->fetchAll(PDO::FETCH_ASSOC);
+        if($user&&count($user)===1)
+        {
+            return new User($user[0][self::USERID],$user[0][self::USERNAME],$user[0][self::PASSWORD],$user[0][self::PRIVILIGELEVEL]);
+        }
+        return null;
     }
 
     public function getUserName()
@@ -101,5 +128,20 @@ class User
     public function getUserID()
     {
         return $this->userId;
+    }
+
+    public function setUserName(string $i_username)
+    {
+        $this->username = $i_username;
+    }
+
+    public function setPassword(string $i_password)
+    {
+        $this->hashPassword = password_hash($i_password,PASSWORD_DEFAULT);
+    }
+
+    public function setPriviligeLevel($i_privilegeLevel)
+    {
+        $this->privilegeLevel = $i_privilegeLevel;
     }
 }
