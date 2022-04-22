@@ -113,6 +113,24 @@ class User
         return null;
     }
 
+    public static function getAllUsers()
+    {
+        $db = DB::getInstance();
+        $query = $db->prepare('SELECT * FROM '.self::USERTABLE);
+        $query->execute();
+        $users = $query->fetchAll(PDO::FETCH_ASSOC);
+        if(!is_null($users))
+        {
+            $userArray = array();
+            foreach($users as $user)
+            {
+                array_push($userArray,new User($user[self::USERID],$user[self::USERNAME],$user[self::PASSWORD],$user[self::PRIVILIGELEVEL]));
+            }
+            return $userArray;
+        }
+        return null;
+    }
+
     public function getUserName()
     {
         return $this->username;

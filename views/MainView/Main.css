@@ -1,15 +1,10 @@
 @import url(//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css);
 
-.container-main{
-    padding: 0;
-    margin: 0;
-	height: 100vh;
-	width: 100vw;
-}
-
-body{
+html, body{
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
+    height: auto;
+
 }
 
 .left{
@@ -64,7 +59,7 @@ body{
 	.right{
 		position: absolute;
 		left: 50px;
-		height: 100vh;
+		height: 100%;
 		width: calc(100vw - 50px);
 	}
 
@@ -81,11 +76,40 @@ body{
 		display: inline-block;
 	}
 
-	.right .container-fluid{
-		margin-left: 3vw;
-		width: 90%;
+	.right .content{
+		width: 100%;
+		height: calc(100vh - 50px);
+		overflow: scroll;
 	}
 
-	.right .container-fluid .table{
-		max-width: 500px;
+	.right .mrgin{
+		padding: 0;
+		margin-right: 5vw;
+	}
+
+	.right .pding{
+		padding-left: 5vw;
+		padding-right: 5vw;
+	}
+
+	.right .center_parent{
+		display: flex;
+  		align-items: center;
+  		justify-content: center;
+	}
+
+	.right .centered{
+		min-width: 60%;
+	}
+
+	.aligned-row {
+		display: flex;
+		flex-flow: row wrap;
+	}
+
+	.right .btns{
+		position: relative;
+    	top: 50%;
+		margin-top: auto;
+		margin-bottom: auto;
 	}

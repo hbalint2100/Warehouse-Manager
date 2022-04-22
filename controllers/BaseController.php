@@ -8,6 +8,7 @@ class BaseController
     private ?string $description = null;
     private ?string $bodyPath = null;
     private ?string $styleSheetPath = null;
+    private ?string $favIconPath = null;
     private ?string $params = null;
     
 
@@ -24,6 +25,11 @@ class BaseController
         return $this->bodyPath;
     }
     protected function getStyleSheetPath()
+    {
+        return $this->styleSheetPath;
+    }
+
+    protected function getFavIconPath()
     {
         return $this->styleSheetPath;
     }
@@ -51,6 +57,15 @@ class BaseController
             throw new FileNotFoundException(__DIR__.'\\'.$i_styleSheetPath.' is missing!');
         }
         $this->styleSheetPath = $i_styleSheetPath;
+    }
+
+    protected function setFavIconPath(string $i_favIconPath)
+    {
+        if(!file_exists($i_favIconPath)&&!file_exists(__DIR__.'\\'.$i_favIconPath))
+        {
+            throw new FileNotFoundException(__DIR__.'\\'.$i_favIconPath.' is missing!');
+        }
+        $this->favIconPath = $i_favIconPath;
     }
 
     protected function show()
