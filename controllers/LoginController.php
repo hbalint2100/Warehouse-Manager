@@ -26,7 +26,7 @@ class LoginController extends BaseController
         }
         $this->setTitle('Login - Warehouse Manager');
         $this->setBodyPath(parent::VIEWS.'\LoginView\Login.php');
-        $this->setStyleSheetPath('..\views\LoginView\Login.css');
+        $this->setStyleSheetPath('/../views/LoginView/Login.css');
         $this->show();
     }
 
@@ -67,6 +67,17 @@ class LoginController extends BaseController
     public static function isAdmin()
     {
         return $_SESSION[self::KEY_ADMIN]?? false;
+    }
+
+    public static function updateSessionUser()
+    {
+        $user = User::getUserByID(self::getUserID());
+        if(!$user)
+        {
+            return false;
+        }
+        $_SESSION[self::KEY_ADMIN] = $user->getPriviligeLevel() === PrivilegeLevels::ADMIN;
+        return true;
     }
 
     public static function getUserID()

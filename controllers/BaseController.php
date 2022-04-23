@@ -9,7 +9,7 @@ class BaseController
     private ?string $bodyPath = null;
     private ?string $styleSheetPath = null;
     private ?string $favIconPath = null;
-    private ?string $params = null;
+    private ?string $path = null;
     
 
     protected function getTitle()
@@ -78,13 +78,13 @@ class BaseController
         $this->show();
     }
 
-    public function setParams(string $i_params)
+    public function setPath(string $i_path)
     {
-        $this->params = $i_params;
+        $this->path = $i_path;
     }
 
-    protected function getParams()
+    protected function getPath()
     {
-        return $this->params;
+        return $this->path;
     }
 }

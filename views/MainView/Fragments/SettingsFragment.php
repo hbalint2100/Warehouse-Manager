@@ -8,6 +8,17 @@
             document.getElementById("privilegelevel").disabled = false;
             document.getElementById("edit_save").firstChild.data = "Save";
         }
+        else if(document.getElementById("edit_save").firstChild.data=="Save")
+        {
+            if(document.getElementById("ownAccount").checkValidity())
+            {
+                document.getElementById("ownAccount").submit();
+            }
+            else
+            {
+                document.getElementById("ownAccount").reportValidity()
+            }
+        }
     }
 
     function editUser(clicked_id)
@@ -22,6 +33,13 @@
     {
         window.location.href = window.location.href+"/add_warehouse";
     }
+    function userDelete()
+    {
+        if(confirm("Are you sure you want to delete the current account?"))
+        {
+            window.location.href = window.location.href+"?deleteuser=true";
+        }   
+    }
 </script>
 <div class="title">
     <h1><strong>Settings</strong></h1>
@@ -34,17 +52,17 @@
             <hr>
             <h3><strong>Your account</strong></h3>
             <hr>
-            <form>
+            <form id="ownAccount" method="POST">
                 <div class="form-group row">
                     <label for="username" class="col-sm-2 col-form-label">Username</label>
                     <div class="col-sm-10">
-                    <input type="text" class="form-control" id="username" name="username" placeholder=<?php echo $this->getFragmentArray()['username']?? '-'?> disabled>
+                    <input type="text" class="form-control" title="Username must be at least 4 characters, at least one of them a letter." pattern="^(?=.*[A-Za-z])[A-Za-z\d]{4,}$" id="username" name="username" placeholder=<?php echo $this->getFragmentArray()['username']?? '-'?> disabled>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="password" class="col-sm-2 col-form-label">Password</label>
                     <div class="col-sm-10">
-                    <input type="password" class="form-control" id="password" name="password" placeholder="******" disabled>
+                    <input type="password" class="form-control" title="Password must be at least 8 characters which must contain at least one letter and one number." pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$" id="password" name="password" placeholder="******" disabled>
                     </div>
                 </div>
                 <div class="form-group row">
@@ -60,7 +78,7 @@
         </div>
         <div class="col-sm-5 h-100" >
             <button type="button" onclick="setEditable()" id="edit_save" class="btn btn-primary btns">Edit</button>
-            <button type="button" class="btn btn-danger btns">Delete</button>
+            <button type="button" onclick="userDelete()" class="btn btn-danger btns">Delete</button>
         </div>
     </div>
     <hr>

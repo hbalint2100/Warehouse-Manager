@@ -36,9 +36,9 @@ class Router
 
             if(method_exists($object,$fun))
             {
-                if(count($requestArray)>1&&!is_null($requestArray[1]) &&$object instanceof BaseController)
+                if($object instanceof BaseController)
                 {
-                    $object->setParams($requestArray[1]);
+                    $object->setPath($route);
                 }
                 call_user_func_array([$object,$fun],[]);
             }

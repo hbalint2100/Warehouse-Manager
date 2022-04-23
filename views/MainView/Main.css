@@ -113,3 +113,8 @@ html, body{
 		margin-top: auto;
 		margin-bottom: auto;
 	}
+
+	.right .message{
+    	color:#ff0000;
+    	opacity:0.9;
+	}
