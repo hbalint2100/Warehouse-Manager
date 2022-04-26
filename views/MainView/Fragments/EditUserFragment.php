@@ -1,7 +1,10 @@
 <script>
     function userDelete()
     {
-        window.location.href = window.location.href+"&delete=true";
+        if(!window.location.href.includes("&delete=true",0))
+        {
+            window.location.href = window.location.href+"&delete=true";
+        }
     }
 </script>
 

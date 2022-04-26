@@ -16,28 +16,6 @@ class MainController extends BaseController
         $this->show();
     }
 
-    public function logs()
-    {
-        $this->checkLogin();
-        if(!LoginController::isAdmin())
-        {
-            header("Location:/warehouse",true,303);
-            exit;
-        }
-        $this->setTitle('Logs - Warehouse Manager');
-        $this->setDescription('Log page for warehouse database manager');
-        $this->setUpMainView();
-        $this->show();
-    }
-
-    public function products()
-    {
-        $this->setTitle('Products - Warehouse Manager');
-        $this->setDescription('Page for products management');
-        $this->setUpMainView();
-        $this->show();
-    }
-
     protected function setUpMainView()
     {
         $this->setBodyPath(parent::VIEWS.'\MainView\Main.php');

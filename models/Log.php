@@ -12,7 +12,7 @@ class Log
     private ?string $time = null;
     private int $userId;
 
-    public function __construct(string $i_action,string $i_userId,int $i_logId = 0)
+    public function __construct(string $i_action,int $i_userId,int $i_logId = 0)
     {
         $this->action = $i_action;
         $this->userId = $i_userId;
@@ -22,10 +22,17 @@ class Log
     public function save()
     {
         $db = DB::getInstance();
-        $query = $db->prepare('INSERT INTO '.self::LOGTABLE.' ('.self::ACTION.','.self::USERID.') VALUES (:action,:userid)');
-        $query->bindParam(':action',$this->action);
-        $query->bindParam(':userid',$this->userId);
-        $query->execute();
+        try
+        {
+            $query = $db->prepare('INSERT INTO '.self::LOGTABLE.' ('.self::ACTION.','.self::USERID.') VALUES (:action,:userid)');
+            $query->bindParam(':action',$this->action);
+            $query->bindParam(':userid',$this->userId);
+            $query->execute();
+        }
+        catch(PDOException $e)
+        {
+            echo $e->getMessage();
+        }
         $this->logId = (int) $db->lastInsertId();
     }
 }

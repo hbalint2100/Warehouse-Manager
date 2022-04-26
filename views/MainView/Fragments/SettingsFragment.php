@@ -33,6 +33,10 @@
     {
         window.location.href = window.location.href+"/add_warehouse";
     }
+    function editWarehouse(clicked_id)
+    {
+        window.location.href = window.location.href+"/edit_warehouse?warehouseid="+clicked_id;
+    }
     function userDelete()
     {
         if(confirm("Are you sure you want to delete the current account?"))
@@ -129,7 +133,7 @@
                 <?php 
                     foreach($this->getFragmentArray()['warehouses'] as $warehouse)
                     {
-                        echo '<tr<td>'.$warehouse->getWarehouseName().'</td><td>'.$warehouse->getDetails().'</td><td><button class="btn btn-primary"></button></td>>';
+                        echo '<tr><td>'.$warehouse->getWarehouseName().'</td><td>'.$warehouse->getDetails().'</td><td><button id="'.$warehouse->getWarehouseId().'" onclick="editWarehouse(this.id)">Edit</button></td>';
                     }
                 ?>
             </tbody>

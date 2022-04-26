@@ -8,6 +8,8 @@ require_once __DIR__.'\controllers\BaseController.php';
 require_once __DIR__.'\controllers\LoginController.php';
 require_once __DIR__.'\controllers\MainController.php';
 require_once __DIR__.'\controllers\SettingsFragmentController.php';
+require_once __DIR__.'\controllers\LogsFragmentController.php';
+require_once __DIR__.'\controllers\ProductsFragmentController.php';
 require_once __DIR__.'\Router.php';
 require_once __DIR__.'\RequestHandler.php';
 require_once __DIR__.'\database\DB.php';
@@ -28,8 +30,10 @@ $router->post('/warehouse/settings/edit_user',[SettingsFragmentController::class
 $router->post('/warehouse/settings',[SettingsFragmentController::class,'editCurrentUser']);
 $router->get('/warehouse/settings/add_warehouse',[SettingsFragmentController::class,'editWarehouse']);
 $router->get('/warehouse/settings/edit_warehouse',[SettingsFragmentController::class,'editWarehouse']);
-$router->get('/warehouse/logs',[MainController::class,'logs']);
-$router->get('/warehouse/products',[MainController::class,'products']);
+$router->post('/warehouse/settings/add_warehouse',[SettingsFragmentController::class,'submitWarehouse']);
+$router->post('/warehouse/settings/edit_warehouse',[SettingsFragmentController::class,'submitWarehouse']);
+$router->get('/warehouse/logs',[LogsFragmentController::class,'index']);
+$router->get('/warehouse/products',[ProductsFragmentController::class,'index']);
 
 $requestHandler = new RequestHandler($router);
 $requestHandler->handleRequest(strtolower($_SERVER['REQUEST_METHOD']),$_SERVER['REQUEST_URI']);

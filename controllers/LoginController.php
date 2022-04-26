@@ -49,6 +49,7 @@ class LoginController extends BaseController
             $_SESSION[self::KEY_LOGINSUCCESS] = true;
             $_SESSION[self::KEY_USERID] = $user->getUserID();
             $_SESSION[self::KEY_ADMIN] = $user->getPriviligeLevel() === PrivilegeLevels::ADMIN;
+            (new Log("Login",self::getUserID()))->save();
             header("Refresh:3; url= /warehouse",true,303);
             exit;
         }
@@ -58,6 +59,7 @@ class LoginController extends BaseController
     {
         if(self::loggedIn())
         {
+            (new Log("Logout",self::getUserID()))->save();
             session_destroy();
         }
         header('Location: /',true,303);

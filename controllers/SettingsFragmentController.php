@@ -7,6 +7,8 @@ class SettingsFragmentController extends MainController
         $this->checkLogin();
         if(isset($_GET['deleteuser'])&&$_GET['deleteuser']=='true')
         {
+            //Deleteing current user account
+            (new Log("Deleted user: ".User::getUserByID(LoginController::getUserID())->getUserName(),LoginController::getUserID()))->save();
             User::deleteUserByID(LoginController::getUserID());
             header('Location: /logout',true,303);
             exit;
@@ -74,9 +76,101 @@ class SettingsFragmentController extends MainController
 
     public function editWarehouse()
     {
-        $this->setTitle('Edit warehouse - Warehouse Manager');
+        if(!LoginController::isAdmin())
+        {
+            header('Location:/warehouse/settings',true,303);
+            exit;
+        }
         $this->setDescription('Edit warehouse subpage of settings');
         $this->setUpMainView();
+        if($this->getPath()=='/warehouse/settings/add_warehouse')
+        {
+            $this->setTitle('New warehouse - Warehouse Manager');
+            $this->fragmentArray['title'] = 'New warehouse';
+        }
+        else if($this->getPath()=='/warehouse/settings/edit_warehouse'&&isset($_GET['warehouseid']))
+        {
+            if(isset($_GET['delete'])&&$_GET['delete']=="true")
+            {
+                if(Warehouse::deleteWarehouseByID(htmlspecialchars($_GET['warehouseid'])))
+                {
+                    echo '<script>alert("Warehouse successfully deleted"); window.location = "/warehouse/settings";</script>';
+                    exit;
+                }
+                else
+                {
+                    echo '<script>alert("Warehouse could not be deleted");</script>';
+                    exit;
+                }
+            }
+            $this->setTitle('Edit warehouse - Warehouse Manager');
+            $this->fragmentArray['title'] = 'Edit warehouse';
+            $warehouse = Warehouse::getWarehouseByID(htmlspecialchars($_GET['warehouseid']));
+            if($warehouse)
+            {
+                $this->fragmentArray['warehousename'] = $warehouse->getWarehouseName();
+                $this->fragmentArray['details'] = $warehouse->getDetails()?? '';
+            }
+        }
+        $this->setFragmentPath(parent::VIEWS.'\MainView\Fragments\EditWarehouseFragment.php');
+        $this->show();
+    }
+
+
+    public function submitWarehouse()
+    {
+        if(!LoginController::isAdmin())
+        {
+            header('Location:/warehouse/settings',true,303);
+            exit;
+        }
+        $this->setTitle('Submitting warehouse - Warehouse Manager');
+        $this->setDescription('Submit warehouse subpage of settings');
+        $this->setUpMainView();
+        if($this->getPath()=='/warehouse/settings/add_warehouse'&&isset($_POST['warehousename']))
+        {
+            $details = null;
+            if(isset($_POST['details']))
+            {
+                $details = $_POST['details'];
+            }
+            if(Warehouse::addWarehouse2DB(htmlspecialchars($_POST['warehousename']),htmlspecialchars($details)))
+            {
+                (new Log("New warehouse: ".htmlspecialchars($_POST['warehousename']),LoginController::getUserID()))->save();
+                echo '<script>alert("Warehouse successfully added"); window.location = "/warehouse/settings";</script>';
+            }
+        }
+        else if('/warehouse/settings/edit_warehouse'&&isset($_GET['warehouseid'])&&isset($_POST['warehousename']))
+        {
+            $warehouse = Warehouse::getWarehouseByID(htmlspecialchars($_GET['warehouseid']));
+            if(is_null($warehouse))
+            {
+                echo '<script>alert("Warehouse could not be loaded); window.location = "/warehouse/settings";</script>';
+                exit;
+            }
+            $anythingSet = false;
+            if($_POST['warehousename']!='')
+            {
+                $warehouse->setWarehouseName(htmlspecialchars($_POST['warehousename']));
+                $anythingSet = true;
+            }
+            if(isset($_POST['details'])&&$_POST['details']!='')
+            {
+                $warehouse->setDetails(htmlspecialchars($_POST['details']));
+                $anythingSet = true;
+            }
+            if($anythingSet&&$warehouse->updateWarehouseInDB())
+            {
+                echo '<script>alert("Warehouse successfully updated"); window.location = "/warehouse/settings";</script>';
+                (new Log($warehouse->getWarehouseName()." - warehouse updated",LoginController::getUserID()))->save();
+                exit;
+            }
+            else
+            {
+                echo '<script>alert("Warehouse could not be updated"); window.location = "/warehouse/settings/edit_warehouse?warehouseid='.$_GET['warehouseid'].'";</script>';
+                exit;
+            }
+        }
         $this->show();
     }
 
@@ -93,12 +187,20 @@ class SettingsFragmentController extends MainController
         $this->setFragmentPath(parent::VIEWS.'\MainView\Fragments\EditUserFragment.php');
         $this->fragmentArray['title'] = "Edit user";
         $user = User::getUserByID($_GET['userid']);
+        //User not in database
+        if(is_null($user))
+        {
+            echo '<script>alert("Warehouse could not be loaded); window.location = "/warehouse/settings";</script>';
+            exit;
+        }
         $this->fragmentArray['username'] = $user->getUserName();
         $this->fragmentArray['priviligelevel'] = $user->getPriviligeLevel();
+        //edit user page deleting user
         if($this->getPath()=='/warehouse/settings/edit_user'&&isset($_GET['userid'])&&isset($_GET['delete'])&&$_GET['delete']=='true')
         {
             if(User::deleteUserByID(htmlspecialchars($_GET['userid'])))
             {
+                (new Log("Deleted user: ".$user->getUserName(),LoginController::getUserID()))->save();
                 echo '<script>alert("User successfully deleted"); window.location = "/warehouse/settings";</script>';
                 exit;
             }
@@ -113,6 +215,7 @@ class SettingsFragmentController extends MainController
 
     public function editCurrentUser()
     {
+        //editing currently logged in user's own account
         if($this->getPath()=='/warehouse/settings'&&LoginController::getUserID())
         {
             $user = User::getUserByID(LoginController::getUserID());
@@ -140,6 +243,7 @@ class SettingsFragmentController extends MainController
             }
             if($anythingSet&&$user->updateUserInDB()&&LoginController::updateSessionUser())
             {
+                (new Log("User parameters updated: ".$user->getUserName(),LoginController::getUserID()))->save();
                 echo '<script>alert("User successfully updated"); window.location = "/warehouse/settings";</script>';
                 exit;
             }
@@ -151,6 +255,7 @@ class SettingsFragmentController extends MainController
         }
     }
 
+    //Add new user page
     public function addUser()
     {
         if(!LoginController::isAdmin())
@@ -166,6 +271,7 @@ class SettingsFragmentController extends MainController
         $this->show();
     }
 
+    //post request handler for add and edit user
     public function submitUser()
     {
         if(!LoginController::isAdmin())
@@ -197,6 +303,7 @@ class SettingsFragmentController extends MainController
             {
                 if(User::registerUser(htmlspecialchars($_POST['username']),htmlspecialchars($_POST['password']),$privilegelevel))
                 {
+                    (new Log("New user created: ".$_POST['username'],LoginController::getUserID()))->save();
                     echo '<script>alert("User successfully saved"); window.location = "/warehouse/settings";</script>';
                     exit;
                 }
@@ -235,6 +342,7 @@ class SettingsFragmentController extends MainController
             }
             if($anythingSet&&$user->updateUserInDB())
             {
+                (new Log("User parameters updated: ".$user->getUserName(),LoginController::getUserID()))->save();
                 echo '<script>alert("User successfully updated"); window.location = "/warehouse/settings";</script>';
                 exit;
             }
