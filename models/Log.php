@@ -11,12 +11,15 @@ class Log
     private string $action;
     private ?string $time = null;
     private int $userId;
+    private ?string $username = null;
 
-    public function __construct(string $i_action,int $i_userId,int $i_logId = 0)
+    public function __construct(string $i_action,int $i_userId,int $i_logId = 0,string $i_username=null,string $i_time = null)
     {
         $this->action = $i_action;
         $this->userId = $i_userId;
         $this->logId = $i_logId;
+        $this->username = $i_username;
+        $this->time = $i_time;
     }
 
     public function save()
@@ -34,6 +37,70 @@ class Log
             echo $e->getMessage();
         }
         $this->logId = (int) $db->lastInsertId();
+    }
+
+    public static function getNth100Logs(int $offset)
+    {
+        $db = DB::getInstance();
+        try
+        {
+            $query = $db->prepare('SELECT LogID, Action, Time, Logs.UserID, Username FROM Logs INNER JOIN users ON logs.UserID=users.userid ORDER BY Time DESC LIMIT 100 OFFSET :offset;');
+            $offset*=100;
+            $query->bindParam(':offset',$offset,PDO::PARAM_INT);
+            $query->execute();
+            $logs = $query->fetchAll(PDO::FETCH_ASSOC);
+            if(!is_null($logs))
+            {
+                $logsArray = array();
+                foreach($logs as $log)
+                {
+                    array_push($logsArray,new Log($log[self::ACTION],$log[self::USERID],$log[self::LOGID],$log['Username'],$log[self::TIME]));
+                }
+                return $logsArray;
+            }
+        }
+        catch(PDOException $e)
+        {
+            echo $e->getMessage();
+            return null;
+        }
+        return null;
+    }
+
+    public function getTime()
+    {
+        return $this->time;
+    }
+
+    public function getAction()
+    {
+        return $this->action;
+    }
+
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    public static function getSize()
+    {
+        $db = DB::getInstance();
+        try
+        {
+            $query = $db->prepare('SELECT COUNT(*) AS Size FROM Logs');
+            $query->execute();
+            $logSize = $query->fetchAll(PDO::FETCH_ASSOC);
+            if(!is_null($logSize))
+            {
+                return $logSize[0]["Size"];
+            }
+        }
+        catch(PDOException $e)
+        {
+            echo $e->getMessage();
+            return null;
+        }
+        return null;
     }
 }
 ?>
