@@ -32,6 +32,7 @@
             <ul class="pagination">
                 <li class="page-item"><button class="btn" onclick="previous()">Previous</button></li>
                 <li class="page-item"><button class="btn" onclick="next()">Next</a></li>
+                <li class="page-item">Page: <?php echo $this->getFragmentArray()['page_start'].'-'.$this->getFragmentArray()['page_end']?></li>
             </ul>
         </nav>
         <table class="table">
