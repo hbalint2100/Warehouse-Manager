@@ -14,9 +14,9 @@ class User
     private string $username;
     private string $hashPassword;
     private PrivilegeLevels $privilegeLevel;
-    private const USERTABLE = "Users";
-    private const USERID = "UserID";
-    private const USERNAME = "Username";
+    public const USERTABLE = "Users";
+    public const USERID = "UserID";
+    public const USERNAME = "Username";
     private const PASSWORD = "Password";
     private const PRIVILIGELEVEL = "PriviligeLevel";
 

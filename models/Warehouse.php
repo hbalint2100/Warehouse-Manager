@@ -7,10 +7,10 @@ class Warehouse
     private int $warehouseId;
     private string $warehouseName;
     private ?string $details;
-    private const WAREHOUSETABLE = "Warehouses";
-    private const WAREHOUSEID = "WarehouseID";
-    private const WAREHOUSENAME = "WarehouseName";
-    private const DETAILS = "AdditionalDetails";
+    public const WAREHOUSETABLE = "Warehouses";
+    public const WAREHOUSEID = "WarehouseID";
+    public const WAREHOUSENAME = "WarehouseName";
+    public const DETAILS = "AdditionalDetails";
 
     public function __construct($i_warehouseId,$i_warehouseName,$i_details = null)
     {

@@ -7,6 +7,7 @@ require_once __DIR__.'\FileNotFoundException.php';
 require_once __DIR__.'\controllers\BaseController.php';
 require_once __DIR__.'\controllers\LoginController.php';
 require_once __DIR__.'\controllers\MainController.php';
+require_once __DIR__.'\controllers\_404Controller.php';
 require_once __DIR__.'\controllers\SettingsFragmentController.php';
 require_once __DIR__.'\controllers\LogsFragmentController.php';
 require_once __DIR__.'\controllers\ProductsFragmentController.php';
@@ -16,6 +17,8 @@ require_once __DIR__.'\database\DB.php';
 require_once __DIR__.'\models\User.php';
 require_once __DIR__.'\models\Warehouse.php';
 require_once __DIR__.'\models\Log.php';
+require_once __DIR__.'\models\Product.php';
+require_once __DIR__.'\models\Stock.php';
 
 $router = new Router();
 $router->get('/',[LoginController::class,'index']);
@@ -34,6 +37,8 @@ $router->post('/warehouse/settings/add_warehouse',[SettingsFragmentController::c
 $router->post('/warehouse/settings/edit_warehouse',[SettingsFragmentController::class,'submitWarehouse']);
 $router->get('/warehouse/logs',[LogsFragmentController::class,'index']);
 $router->get('/warehouse/products',[ProductsFragmentController::class,'index']);
+$router->get('/warehouse/products/add_product',[ProductsFragmentController::class,'addProduct']);
+$router->get('/warehouse/products/edit_product',[ProductsFragmentController::class,'editProduct']);
 
 $requestHandler = new RequestHandler($router);
 $requestHandler->handleRequest(strtolower($_SERVER['REQUEST_METHOD']),$_SERVER['REQUEST_URI']);

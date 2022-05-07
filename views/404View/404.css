@@ -1,0 +1,23 @@
+body {
+    background-image:  url(../404View/chaos.jpg);
+    height:100vh;
+    background-size:cover;
+    background-repeat: no-repeat;
+    position:relative;
+    background-position: center;
+    overflow: hidden;
+}
+
+h1{
+    color: white;
+    position: fixed;
+    top: 40%;
+    left: 40%;
+}
+
+h2{
+    color: white;
+    position: fixed;
+    top: 50%;
+    left: 40%;
+}

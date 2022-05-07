@@ -39,14 +39,14 @@ class Log
         $this->logId = (int) $db->lastInsertId();
     }
 
-    public static function getNth100Logs(int $offset)
+    public static function getNth100Logs(int $N)
     {
         $db = DB::getInstance();
         try
         {
-            $query = $db->prepare('SELECT LogID, Action, Time, Logs.UserID, Username FROM Logs INNER JOIN users ON logs.UserID=users.userid ORDER BY Time DESC LIMIT 100 OFFSET :offset;');
-            $offset*=100;
-            $query->bindParam(':offset',$offset,PDO::PARAM_INT);
+            $query = $db->prepare('SELECT '.self::LOGID.', '.self::ACTION.', '.self::TIME.', '.self::LOGTABLE.'.'.self::USERID.', '.User::USERNAME.' FROM '.self::LOGTABLE.' INNER JOIN '.User::USERTABLE.' ON '.self::LOGTABLE.'.'.self::USERID.' = '.User::USERTABLE.'.'.User::USERID.' ORDER BY '.self::TIME.' DESC LIMIT 100 OFFSET :offset;');
+            $N*=100;
+            $query->bindParam(':offset',$N,PDO::PARAM_INT);
             $query->execute();
             $logs = $query->fetchAll(PDO::FETCH_ASSOC);
             if(!is_null($logs))

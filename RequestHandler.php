@@ -18,6 +18,12 @@ class RequestHandler
         }
         catch(PageNotFoundException|FileNotFoundException $e)
         {
+            if($e instanceof PageNotFoundException)
+            {
+                http_response_code(404);
+                (new _404Controller())->index();
+                exit;
+            }
             echo $e->getMessage();
         }
     }
