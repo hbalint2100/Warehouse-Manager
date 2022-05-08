@@ -66,6 +66,29 @@ class Stock
         }
         return null;
     }
+
+    public function insertStock2DB($i_productId)
+    {
+        if(is_null($i_productId)||is_null($this->warehouse))
+        {
+            return null;
+        }
+        $db = DB::getInstance();
+        try
+        {
+            $query = $db->prepare('INSERT INTO '.self::STOCKTABLE.' ( '.self::PRODUCTID.', '.self::WAREHOUSEID.', '.self::AMOUNT.') VALUES(:productid,:warehouseid,:amount)');
+            $query->bindParam(':productid',$i_productId);
+            $warehouseId = $this->warehouse->getWarehouseId();
+            $query->bindParam(':warehouseid',$warehouseId);
+            $query->bindParam(':amount',$this->amount);
+            $query->execute();
+            return $this;
+        }
+        catch(PDOException $e)
+        {
+            return null;
+        }
+    }
 }
 
 ?>

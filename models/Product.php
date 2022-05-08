@@ -19,7 +19,7 @@ class Product
     private const NETPRICE = "NetPrice";
     private const GROSSPRICE = "GrossPrice";
 
-    public function __construct(int $i_productId,string $i_itemNumber,string $i_name,string $i_category = null, int $i_netPrice,?int $i_grossPrice = 0,?array $i_stocks)
+    public function __construct(int $i_productId = 0,string $i_itemNumber,string $i_name,string $i_category = null, int $i_netPrice,?int $i_grossPrice = 0,?array $i_stocks)
     {
         $this->productId = $i_productId;
         $this->itemNumber = $i_itemNumber;
@@ -42,10 +42,10 @@ class Product
             $query = $db->prepare('SELECT '.self::PRODUCT_TABLE.'.'.self::PRODUCTID.', '.self::PRODUCT_TABLE.'.'.self::ITEMNUMBER.', '
             .self::PRODUCT_TABLE.'.'.self::CATEGORY.', '.self::PRODUCT_TABLE.'.'.self::NAME.', '.self::PRODUCT_TABLE.'.'.self::NETPRICE.', '
             .self::PRODUCT_TABLE.'.'.self::GROSSPRICE.', '.Stock::STOCKTABLE.'.'.Stock::AMOUNT.', '.Warehouse::WAREHOUSETABLE.'.'.Warehouse::WAREHOUSEID.', '
-            .Warehouse::WAREHOUSETABLE.'.'.Warehouse::WAREHOUSENAME.', '.Warehouse::WAREHOUSETABLE.'.'.Warehouse::DETAILS.' FROM '.self::PRODUCT_TABLE.' INNER JOIN '
-            .Stock::STOCKTABLE.' ON '.Stock::STOCKTABLE.'.'.Stock::PRODUCTID.' = '.self::PRODUCT_TABLE.'.'.self::PRODUCTID.' INNER JOIN '
+            .Warehouse::WAREHOUSETABLE.'.'.Warehouse::WAREHOUSENAME.', '.Warehouse::WAREHOUSETABLE.'.'.Warehouse::DETAILS.' FROM '.self::PRODUCT_TABLE.' LEFT OUTER JOIN '
+            .Stock::STOCKTABLE.' ON '.Stock::STOCKTABLE.'.'.Stock::PRODUCTID.' = '.self::PRODUCT_TABLE.'.'.self::PRODUCTID.' LEFT OUTER JOIN '
             .Warehouse::WAREHOUSETABLE.' ON '.Stock::STOCKTABLE.'.'.Stock::WAREHOUSEID.' = '.Warehouse::WAREHOUSETABLE.'.'.Warehouse::WAREHOUSEID.
-            ' WHERE '.self::PRODUCT_TABLE.'.'.self::PRODUCTID.' =:productid GROUP BY '.self::PRODUCT_TABLE.'.'.self::PRODUCTID.';');
+            ' WHERE '.Stock::STOCKTABLE.'.'.Stock::PRODUCTID.' =:productid;');
 
             $query->bindParam(':productid',$i_productId);
             $query->execute();
@@ -55,9 +55,12 @@ class Product
                 $stockArray = array();
                 foreach($stocks as $stock)
                 {
-                    array_push($stockArray,new Stock(new Warehouse($stocks[Warehouse::WAREHOUSEID],$stocks[Warehouse::WAREHOUSENAME],$stocks[Warehouse::DETAILS]),$stocks[Stock::AMOUNT]));
+                    if($stock[Warehouse::WAREHOUSEID]&&$stock[Warehouse::WAREHOUSENAME]&&$stock[Stock::AMOUNT])
+                    {
+                        array_push($stockArray,new Stock(new Warehouse($stock[Warehouse::WAREHOUSEID],$stock[Warehouse::WAREHOUSENAME],$stock[Warehouse::DETAILS]),$stock[Stock::AMOUNT]));
+                    }
                 }
-                return new Product($stock[0][self::PRODUCTID],$stock[0][self::ITEMNUMBER],$stock[0][self::NAME],$stock[0][self::CATEGORY],$stock[0][self::NETPRICE],$stock[0][self::GROSSPRICE],$stockArray);
+                return new Product($stocks[0][self::PRODUCTID],$stocks[0][self::ITEMNUMBER],$stocks[0][self::NAME],$stocks[0][self::CATEGORY],(int) $stocks[0][self::NETPRICE],(int) $stocks[0][self::GROSSPRICE],$stockArray);
             }
         }
         catch(PDOException $e)
@@ -96,6 +99,41 @@ class Product
         return null;
     }
 
+    public function insertProduct2DB()
+    {
+        if(!is_null($this->name))
+        {
+            $db = DB::getInstance();
+            try
+            {
+                $db->beginTransaction();
+                $query = $db->prepare('INSERT INTO '.self::PRODUCT_TABLE.' ( '.self::NAME.', '.self::ITEMNUMBER.', '.self::CATEGORY.', '.self::NETPRICE.', '.self::GROSSPRICE.
+                ') VALUES(:name,:itemnumber,:category,:netprice,:grossprice)');
+                $query->bindParam(':name',$this->name);
+                $query->bindParam(':itemnumber',$this->itemNumber);
+                $query->bindParam(':category',$this->category);
+                $query->bindParam(':netprice',$this->netPrice);
+                $query->bindParam(':grossprice',$this->grossPrice);
+                $query->execute();
+                $this->productId = (int) $db->lastInsertId();
+                foreach($this->stocks as $stock)
+                {
+                    if(is_null($stock->insertStock2DB($this->productId)))
+                    {
+                        throw new Exception('Insert fail');
+                    }
+                }
+                $db->commit();
+                return $this;
+            }
+            catch(Exception|PDOException $e)
+            {
+                $db->rollBack();
+                return null;
+            }
+        }
+    }
+
     public function updateProductInDB()
     {
         if(!is_null($this->productId))
@@ -116,16 +154,31 @@ class Product
 
                 foreach($this->stocks as $stock)
                 {
-                    $query2 = $db->prepare('UPDATE '.Stock::STOCKTABLE.' INNER JOIN '.Warehouse::WAREHOUSETABLE.' ON '
-                    .Stock::STOCKTABLE.'.'.Stock::WAREHOUSEID.' = '.Warehouse::WAREHOUSETABLE.'.'.Warehouse::WAREHOUSEID.
-                    ' SET '.Stock::STOCKTABLE.'.'.Stock::AMOUNT.' = :amount WHERE '.Warehouse::WAREHOUSETABLE.'.'.Warehouse::WAREHOUSENAME.' = :warehousename;');
-                    $query2->bindParam(':amount',$stock->getAmount());
-                    $query2->bindParam(':warehousename',$stock->getWarehouse()->getWarehouseName());
-                    $query2->execute();
+                    $query3 = $db->prepare('SELECT COUNT(*) AS EXISTING FROM '.Stock::STOCKTABLE.' WHERE '.Stock::STOCKTABLE.'.'.Stock::WAREHOUSEID.' = :warehouseid ;' );
+                    $warehouseId = $stock->getWarehouse()->getWarehouseId();
+                    $query3->bindParam(':warehouseid',$warehouseId);
+                    $query3->execute();
+                    $exists = $query3->fetchAll(PDO::FETCH_ASSOC)[0]['EXISTING'];
+                    if($exists)
+                    {
+                        $query2 = $db->prepare('UPDATE '.Stock::STOCKTABLE.
+                        ' SET '.Stock::AMOUNT.' = :amount WHERE '.Stock::STOCKTABLE.'.'.Stock::WAREHOUSEID.' = :warehouseid ;');
+                        $amount = $stock->getAmount();
+                        $query2->bindParam(':amount',$amount);
+                        $query2->bindParam(':warehouseid',$warehouseId);
+                        $query2->execute();
+                    }
+                    else
+                    {
+                        if(is_null($stock->insertStock2DB($this->productId)))
+                        {
+                            throw new Exception('Insert fail');
+                        }
+                    }
                 }
                 $db->commit();
             }
-            catch(PDOException $e)
+            catch(Exception|PDOException $e)
             {
                 $db->rollBack();
                 return false;
@@ -168,6 +221,41 @@ class Product
     public function getStocks()
     {
         return $this->stocks;
+    }
+
+    public function setProductId(int $i_productId)
+    {
+        $this->productId = $i_productId;
+    }
+
+    public function setItemNumber(string $i_itemNumber)
+    {
+        $this->itemNumber = $i_itemNumber;
+    }
+
+    public function setName(string $i_name)
+    {
+        $this->name = $i_name;
+    }
+
+    public function setCategory(string $i_category)
+    {
+        $this->category = $i_category;
+    }
+
+    public function setNetPrice(int $i_netPrice)
+    {
+        $this->netPrice = $i_netPrice;
+    }
+
+    public function setGrossPrice(int $i_grossPrice)
+    {
+        $this->grossPrice = $i_grossPrice;
+    }
+
+    public function setStocks(array $i_stocks)
+    {
+        $this->stocks = $i_stocks;
     }
 }
 

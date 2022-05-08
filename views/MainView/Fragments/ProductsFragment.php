@@ -1,12 +1,12 @@
 <script>
     function editProduct(clicked_id)
     {
-        window.location.href = window.location.href+"/edit_product?productid="+clicked_id;
+        window.location.href = window.location.href.split('?')[0]+"/edit_product?productid="+clicked_id;
     }
 
     function addProduct()
     {
-        window.location.href = window.location.href+"/add_product";
+        window.location.href = window.location.href.split('?')[0]+"/add_product";
     }
 
     function next()

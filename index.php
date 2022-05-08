@@ -39,6 +39,8 @@ $router->get('/warehouse/logs',[LogsFragmentController::class,'index']);
 $router->get('/warehouse/products',[ProductsFragmentController::class,'index']);
 $router->get('/warehouse/products/add_product',[ProductsFragmentController::class,'addProduct']);
 $router->get('/warehouse/products/edit_product',[ProductsFragmentController::class,'editProduct']);
+$router->post('/warehouse/products/add_product',[ProductsFragmentController::class,'submitProduct']);
+$router->post('/warehouse/products/edit_product',[ProductsFragmentController::class,'submitProduct']);
 
 $requestHandler = new RequestHandler($router);
 $requestHandler->handleRequest(strtolower($_SERVER['REQUEST_METHOD']),$_SERVER['REQUEST_URI']);

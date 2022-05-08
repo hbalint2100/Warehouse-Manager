@@ -140,7 +140,7 @@ class SettingsFragmentController extends MainController
                 echo '<script>alert("Warehouse successfully added"); window.location = "/warehouse/settings";</script>';
             }
         }
-        else if('/warehouse/settings/edit_warehouse'&&isset($_GET['warehouseid'])&&isset($_POST['warehousename']))
+        else if($this->getPath()=='/warehouse/settings/edit_warehouse'&&isset($_GET['warehouseid'])&&isset($_POST['warehousename']))
         {
             $warehouse = Warehouse::getWarehouseByID(htmlspecialchars($_GET['warehouseid']));
             if(is_null($warehouse))

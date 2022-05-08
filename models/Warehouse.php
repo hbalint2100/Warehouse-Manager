@@ -143,9 +143,10 @@ class Warehouse
             $db = DB::getInstance();
             try
             {
-                $query = $db->prepare('UPDATE '.self::WAREHOUSETABLE.' SET '.self::WAREHOUSENAME.'=:warehousename, '.self::DETAILS.'=:details');
+                $query = $db->prepare('UPDATE '.self::WAREHOUSETABLE.' SET '.self::WAREHOUSENAME.'=:warehousename, '.self::DETAILS.'=:details'.' WHERE '.self::WAREHOUSEID.'=:warehouseid');
                 $query->bindParam(':warehousename',$this->warehouseName);
                 $query->bindParam(':details',$this->details);
+                $query->bindParam(':warehouseid',$this->warehouseId);
                 $query->execute();
             }
             catch(PDOException $e)

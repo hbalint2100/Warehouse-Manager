@@ -2,15 +2,29 @@
         window.onload = function(){
             document.getElementById("netprice").addEventListener("input", function (e) {
                 document.getElementById("grossprice").value = document.getElementById("netprice").value * 1.27;
+                
             });
-            window.stocks = 1;
+            window.stocks = <?php echo isset($this->getFragmentArray()['stocks'])? count($this->getFragmentArray()['stocks']): '1'; ?>;
+            document.getElementById("warehouse-1").selectedIndex = 0;
+
         };
 
-        function selected()
+        function selected(selected_id)
         {
             //todo remove duplicate warehouse
-            for (let i = 1; i < <?php echo $this->getFragmentArray()['warehousecount']?? 1?>; i++) {
-                document.getElementById("warehouseid-"+i).removeChild()
+            for (let i = 1; i <= <?php echo $this->getFragmentArray()['warehousecount']?? 1?>; i++) {
+                if(("warehouse-"+i)!=selected_id)
+                {
+                    for(let j = 0; j < document.getElementById("warehouse-"+i).length; j++)
+                    {
+                        document.getElementById("warehouse-"+i).options[j].removeAttribute("hidden");
+                        if(document.getElementById("warehouse-"+i).selectedIndex==document.getElementById(selected_id).selectedIndex&&j!=document.getElementById(selected_id).selectedIndex)
+                        {
+                            document.getElementById("warehouse-"+i).selectedIndex = j;
+                        }
+                    }
+                    document.getElementById("warehouse-"+i).options[document.getElementById(selected_id).selectedIndex].setAttribute("hidden",true);
+                }
             }
         }
 
@@ -21,14 +35,30 @@
                 return;
             }
             var row = document.getElementById("stocks").insertRow(0);
-            row.insertCell(0).innerHTML = "<select class=\"form-select\" id=\"warehouse-"+(++window.stocks)+"\" name=\"warehouseid-1\">"+
+            row.insertCell(0).innerHTML = "<select onchange=\"selected(this.id)\" class=\"form-select\" id=\"warehouse-"+(++window.stocks)+"\" name=\"warehouseid-"+(window.stocks)+"\">"+
                                             "<?php 
                                                 foreach($this->getFragmentArray()['warehouses'] as $warehouse)
                                                 {
                                                     echo '<option value=\"'.$warehouse->getWarehouseId().'\">'.$warehouse->getWarehouseName().'</option>';
                                                 }
                                             ?>"+"</select>";
-            row.insertCell(1).innerHTML = "<input type=\"number\" min=\"0\" class=\"form-control\" id=\"amount-1\" name=\"amount-1\">"
+            row.insertCell(1).innerHTML = "<input type=\"number\" min=\"0\" class=\"form-control\" id=\"amount-"+(window.stocks)+"\" name=\"amount-"+(window.stocks)+"\">"
+
+            for (let i = 1; i < <?php echo $this->getFragmentArray()['warehousecount']?? 1?>; i++) 
+            {
+                if(("warehouse-"+i)!=("warehouse-"+window.stocks))
+                {
+                    document.getElementById("warehouse-"+window.stocks).options[document.getElementById("warehouse-"+i).selectedIndex].setAttribute("hidden",true);
+                }
+            }
+            for(let j = 0; j < document.getElementById("warehouse-"+window.stocks).length; j++)
+            {
+                if(!document.getElementById("warehouse-"+window.stocks).options[j].getAttribute("hidden"))
+                {
+                    document.getElementById("warehouse-"+window.stocks).selectedIndex = j;
+                }
+            }
+            document.getElementById("stocks_length").value = window.stocks;
         }
 </script>
 <div class="title">
@@ -37,7 +67,7 @@
 <div class="content center_parent">
     <div class="centered">
         <button class="btn btn-primary" onclick="location.href='/warehouse/products'">Back</button>
-        <h2><?php if(isset($this->getFragmentArray()['title'])) {echo ($this->getFragmentArray()['title']=="New product")? "Create a new product": ("Edit product: ".$this->getFragmentArray()['productname']);} ?> </h2>
+        <h2><?php if(isset($this->getFragmentArray()['title'])) {echo ($this->getFragmentArray()['title']=="New product")? "Create a new product": ("Edit product: ".((isset($this->getFragmentArray()['productname']))? $this->getFragmentArray()['productname'] :''));} ?> </h2>
         <hr>
         <div class="container-fluid">
             <form method="POST">
@@ -77,23 +107,51 @@
                                 </tr>
                             </thead>
                             <tbody id="stocks">
+                                <?php 
+                                if(isset($this->getFragmentArray()['stocks'])&&!is_null($this->getFragmentArray()['stocks']))
+                                {
+                                    foreach($this->getFragmentArray()['stocks'] as $stock)
+                                    {
+                                        echo '  <tr>
+                                                    <td>
+                                                        <select onchange="selected(this.id)" class="form-select" id="warehouse-1" name="warehouseid-1">
+                                                            '; 
+                                                                foreach($this->getFragmentArray()['warehouses'] as $warehouse)
+                                                                {
+                                                                    echo '<option value="'.$warehouse->getWarehouseId().'" '. (($stock->getWarehouse()->getWarehouseId()==$warehouse->getWarehouseId())?'selected ':'').'>'.$warehouse->getWarehouseName().'</option>';
+                                                                }
+                                                            echo '
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" min="0" class="form-control" placeholder="'.$stock->getAmount().'" id="amount-1" name="amount-1">
+                                                    </td>
+                                                </tr>';
+                                    }
+                                }
+                                else
+                                { 
+                                    echo '
                                 <tr>
                                     <td>
-                                        <select class="form-select" id="warehouse-1" name="warehouseid-1">
-                                            <?php 
+                                        <select onchange="selected(this.id)" class="form-select" id="warehouse-1" name="warehouseid-1">
+                                            '; 
                                                 foreach($this->getFragmentArray()['warehouses'] as $warehouse)
                                                 {
                                                     echo '<option value="'.$warehouse->getWarehouseId().'">'.$warehouse->getWarehouseName().'</option>';
                                                 }
-                                            ?>
+                                            echo '
                                         </select>
                                     </td>
                                     <td>
                                         <input type="number" min="0" class="form-control" id="amount-1" name="amount-1">
                                     </td>
-                                </tr>
+                                </tr>';
+                                }
+                                ?>
                             </tbody>
                         </table>
+                        <input type="hidden" id="stocks_length" value="1" name="stocks_length">
                         <button type="button" onclick="addStock()">Add warehouse</button>
                     </div>
                 </div>
