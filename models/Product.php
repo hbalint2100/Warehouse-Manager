@@ -45,11 +45,12 @@ class Product
             .Warehouse::WAREHOUSETABLE.'.'.Warehouse::WAREHOUSENAME.', '.Warehouse::WAREHOUSETABLE.'.'.Warehouse::DETAILS.' FROM '.self::PRODUCT_TABLE.' LEFT OUTER JOIN '
             .Stock::STOCKTABLE.' ON '.Stock::STOCKTABLE.'.'.Stock::PRODUCTID.' = '.self::PRODUCT_TABLE.'.'.self::PRODUCTID.' LEFT OUTER JOIN '
             .Warehouse::WAREHOUSETABLE.' ON '.Stock::STOCKTABLE.'.'.Stock::WAREHOUSEID.' = '.Warehouse::WAREHOUSETABLE.'.'.Warehouse::WAREHOUSEID.
-            ' WHERE '.Stock::STOCKTABLE.'.'.Stock::PRODUCTID.' =:productid;');
+            ' WHERE '.Product::PRODUCT_TABLE.'.'.Product::PRODUCTID.' =:productid;');
 
             $query->bindParam(':productid',$i_productId);
             $query->execute();
             $stocks = $query->fetchAll(PDO::FETCH_ASSOC);
+
             if($stocks)
             {
                 $stockArray = array();
@@ -154,18 +155,20 @@ class Product
 
                 foreach($this->stocks as $stock)
                 {
-                    $query3 = $db->prepare('SELECT COUNT(*) AS EXISTING FROM '.Stock::STOCKTABLE.' WHERE '.Stock::STOCKTABLE.'.'.Stock::WAREHOUSEID.' = :warehouseid ;' );
+                    $query3 = $db->prepare('SELECT COUNT(*) AS EXISTING FROM '.Stock::STOCKTABLE.' WHERE '.Stock::WAREHOUSEID.' = :warehouseid AND '.Stock::PRODUCTID.' = :productid;' );
                     $warehouseId = $stock->getWarehouse()->getWarehouseId();
                     $query3->bindParam(':warehouseid',$warehouseId);
+                    $query3->bindParam(':productid',$this->productId);
                     $query3->execute();
                     $exists = $query3->fetchAll(PDO::FETCH_ASSOC)[0]['EXISTING'];
                     if($exists)
                     {
                         $query2 = $db->prepare('UPDATE '.Stock::STOCKTABLE.
-                        ' SET '.Stock::AMOUNT.' = :amount WHERE '.Stock::STOCKTABLE.'.'.Stock::WAREHOUSEID.' = :warehouseid ;');
+                        ' SET '.Stock::AMOUNT.' = :amount WHERE '.Stock::STOCKTABLE.'.'.Stock::WAREHOUSEID.' = :warehouseid AND '.Stock::PRODUCTID.' = :productid;');
                         $amount = $stock->getAmount();
                         $query2->bindParam(':amount',$amount);
                         $query2->bindParam(':warehouseid',$warehouseId);
+                        $query2->bindParam(':productid',$this->productId);
                         $query2->execute();
                     }
                     else
@@ -256,6 +259,26 @@ class Product
     public function setStocks(array $i_stocks)
     {
         $this->stocks = $i_stocks;
+    }
+
+    public static function deleteProductByID(int $i_productId)
+    {
+        if(is_null($i_productId))
+        {
+            return false;
+        }
+        $db = DB::getInstance();
+        try
+        {
+            $query = $db->prepare('DELETE FROM '.self::PRODUCT_TABLE.' WHERE '.self::PRODUCTID.'=:productid');
+            $query->bindParam(':productid',$i_productId);
+            $query->execute();
+        }
+        catch(PDOException $e)
+        {
+            return false;
+        }
+        return true;
     }
 }
 

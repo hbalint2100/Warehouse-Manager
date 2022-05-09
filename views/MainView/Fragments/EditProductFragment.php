@@ -1,10 +1,11 @@
 <script>
         window.onload = function(){
             document.getElementById("netprice").addEventListener("input", function (e) {
-                document.getElementById("grossprice").value = document.getElementById("netprice").value * 1.27;
+                document.getElementById("grossprice").value = Math.round(document.getElementById("netprice").value * 1.27);
                 
             });
-            window.stocks = <?php echo isset($this->getFragmentArray()['stocks'])? count($this->getFragmentArray()['stocks']): '1'; ?>;
+            window.stocks = <?php echo isset($this->getFragmentArray()['stocks'])? count($this->getFragmentArray()['stocks']) : '1'; ?>;
+            document.getElementById("stocks_length").value = window.stocks;
             document.getElementById("warehouse-1").selectedIndex = 0;
 
         };
@@ -60,6 +61,14 @@
             }
             document.getElementById("stocks_length").value = window.stocks;
         }
+
+        function productDelete()
+        {
+            if(!window.location.href.includes("&delete=true",0))
+            {
+                window.location.href = window.location.href+"&delete=true";
+            }
+        }
 </script>
 <div class="title">
     <h1><strong><?php echo $this->getFragmentArray()['title']?? ''; ?></strong></h1>
@@ -110,11 +119,12 @@
                                 <?php 
                                 if(isset($this->getFragmentArray()['stocks'])&&!is_null($this->getFragmentArray()['stocks']))
                                 {
+                                    $i = 1;
                                     foreach($this->getFragmentArray()['stocks'] as $stock)
                                     {
                                         echo '  <tr>
                                                     <td>
-                                                        <select onchange="selected(this.id)" class="form-select" id="warehouse-1" name="warehouseid-1">
+                                                        <select onchange="selected(this.id)" class="form-select" id="warehouse-'.$i.'" name="warehouseid-'.$i.'">
                                                             '; 
                                                                 foreach($this->getFragmentArray()['warehouses'] as $warehouse)
                                                                 {
@@ -124,9 +134,10 @@
                                                         </select>
                                                     </td>
                                                     <td>
-                                                        <input type="number" min="0" class="form-control" placeholder="'.$stock->getAmount().'" id="amount-1" name="amount-1">
+                                                        <input type="number" min="0" class="form-control" placeholder="'.$stock->getAmount().'" id="amount-'.$i.'" name="amount-'.$i.'">
                                                     </td>
                                                 </tr>';
+                                        $i++;
                                     }
                                 }
                                 else
