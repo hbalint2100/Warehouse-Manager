@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+//handles queries from warehouse table and creates php objects from them
 class Warehouse
 {
     private int $warehouseId;
@@ -70,6 +71,7 @@ class Warehouse
         return null;
     }
 
+    //insert new warehouse
     public static function addWarehouse2DB(string $i_warehouseName, ?string $i_details = null)
     {
         if(is_null($i_warehouseName))

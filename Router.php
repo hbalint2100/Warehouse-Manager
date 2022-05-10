@@ -32,14 +32,17 @@ class Router
         [$class, $fun] = $action;
         if(class_exists($class))
         {
+            //creating controller class for request
             $object = new $class;
 
             if(method_exists($object,$fun))
             {
+                //passing splitted route to basecontroller for easier access
                 if($object instanceof BaseController)
                 {
                     $object->setPath($route);
                 }
+                //handling request in controller
                 call_user_func_array([$object,$fun],[]);
             }
         }

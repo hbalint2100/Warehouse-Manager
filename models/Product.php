@@ -1,5 +1,6 @@
 <?php 
 
+//handles product table queries and creates product objects
 declare(strict_types=1);
 class Product
 {
@@ -9,6 +10,7 @@ class Product
     private ?string $category;
     private int $netPrice;
     private ?int $grossPrice;
+    //holds array of stocks related to this product
     private ?array $stocks;
     
     private const PRODUCT_TABLE = "Products";
@@ -72,6 +74,38 @@ class Product
 
     }
 
+    //gives back page nth page content with matching search phrase
+    public static function getNth100ProductsWithSearch(int $N,string $search)
+    {
+        $db = DB::getInstance();
+        try
+        {
+            $query = $db->prepare('SELECT * FROM '.self::PRODUCT_TABLE.' WHERE '.self::NAME.' LIKE :search OR '.self::ITEMNUMBER.' LIKE :search ORDER BY '.self::ITEMNUMBER.' ASC LIMIT 100 OFFSET :offset;');
+            $N*=100;
+            $query->bindParam(':offset',$N,PDO::PARAM_INT);
+            $search =  '%'.$search.'%';
+            $query->bindParam(':search',$search);
+            $query->execute();
+            $products = $query->fetchAll(PDO::FETCH_ASSOC);
+            if(!is_null($products))
+            {
+                $productsArray = array();
+                foreach($products as $product)
+                {
+                    array_push($productsArray,new Product($product[self::PRODUCTID],$product[self::ITEMNUMBER],$product[self::NAME],$product[self::CATEGORY],(int) $product[self::NETPRICE],(int) $product[self::GROSSPRICE],Stock::getStocksByProductID($product[self::PRODUCTID])));
+                }
+                return $productsArray;
+            }
+        }
+        catch(PDOException $e)
+        {
+            echo $e->getMessage();
+            return null;
+        }
+        return null;
+    }
+
+    //gives back page nth page content
     public static function getNth100Products(int $N)
     {
         $db = DB::getInstance();
@@ -100,6 +134,7 @@ class Product
         return null;
     }
 
+    //inserting object to db
     public function insertProduct2DB()
     {
         if(!is_null($this->name))
@@ -135,6 +170,7 @@ class Product
         }
     }
 
+    //updating object details in db -> stocks might be inserted
     public function updateProductInDB()
     {
         if(!is_null($this->productId))
@@ -189,6 +225,28 @@ class Product
             return true;
         }
         return false;
+    }
+
+    //returns number of products in db
+    public static function getSize()
+    {
+        $db = DB::getInstance();
+        try
+        {
+            $query = $db->prepare('SELECT COUNT(*) AS Size FROM '.self::PRODUCT_TABLE);
+            $query->execute();
+            $productSize = $query->fetchAll(PDO::FETCH_ASSOC);
+            if(!is_null($productSize))
+            {
+                return $productSize[0]["Size"];
+            }
+        }
+        catch(PDOException $e)
+        {
+            echo $e->getMessage();
+            return null;
+        }
+        return null;
     }
 
     public function getProductId()

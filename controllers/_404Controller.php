@@ -1,5 +1,5 @@
 <?php
-
+//404 view controller for -> page not found exceptions
 declare(strict_types=1);
 class _404Controller extends BaseController
 {

@@ -1,3 +1,4 @@
+<?php //Base view, every view is generated into this -> basecontroller handles parameters?>
 <!DOCTYPE html>
 <html>
     <head>

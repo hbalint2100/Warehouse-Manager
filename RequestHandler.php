@@ -14,12 +14,14 @@ class RequestHandler
     {
         try
         {
+            //resolving request
             $this->router->resolve($i_route,$i_method);
         }
         catch(PageNotFoundException|FileNotFoundException $e)
         {
             if($e instanceof PageNotFoundException)
             {
+                //handling 404
                 http_response_code(404);
                 (new _404Controller())->index();
                 exit;

@@ -1,5 +1,6 @@
 <?php
-
+//parent of every fragment controller -> handles basic page setup -> stylesheet,
+// navbar, fragments(smaller part of the view), favicon, checks login before show, checks if viewing of logs is enebaled
 declare(strict_types=1);
 class MainController extends BaseController
 {

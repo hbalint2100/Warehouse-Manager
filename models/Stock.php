@@ -1,5 +1,6 @@
 <?php 
 
+//handles queries of stock from db and object creation
 declare(strict_types=1);
 class Stock
 {
@@ -65,6 +66,24 @@ class Stock
             return null;
         }
         return null;
+    }
+
+    
+    public static function deleteStock(int $i_productId,int $i_warehouseId)
+    {
+        $db = DB::getInstance();
+        try
+        {
+            $query = $db->prepare('DELETE FROM '.self::STOCKTABLE.' WHERE '.self::PRODUCTID.' =:productid AND '.self::WAREHOUSEID.' =:warehouseid');
+            $query->bindParam(':productid',$i_productId);
+            $query->bindParam(':warehouseid',$i_warehouseId);
+            $query->execute();         
+        }
+        catch(PDOException $e)
+        {
+            return false;
+        }
+        return true;
     }
 
     public function insertStock2DB($i_productId)

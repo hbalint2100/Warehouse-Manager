@@ -1,5 +1,5 @@
 <?php
-
+//handling settings page of main view
 class SettingsFragmentController extends MainController
 {
     public function index()
@@ -7,7 +7,7 @@ class SettingsFragmentController extends MainController
         $this->checkLogin();
         if(isset($_GET['deleteuser'])&&$_GET['deleteuser']=='true')
         {
-            //Deleteing current user account
+            //Deleting current user account
             (new Log("Deleted user: ".User::getUserByID(LoginController::getUserID())->getUserName(),LoginController::getUserID()))->save();
             User::deleteUserByID(LoginController::getUserID());
             header('Location: /logout',true,303);
@@ -50,16 +50,19 @@ class SettingsFragmentController extends MainController
         $this->show();
     }
 
+    //checking if other than current user should be showed to the user
     public function showOtherUsers()
     {
         return LoginController::isAdmin();
     }
 
+    //checks if warehouse editing is enabled for user
     public function editWarehouses()
     {
         return LoginController::isAdmin();
     }
 
+    //checking pattern of username
     private function checkUsername($i_username)
     {
         //Must contain 4 chars, at least one letter
@@ -67,6 +70,7 @@ class SettingsFragmentController extends MainController
         return preg_match($pattern,$i_username);
     }
 
+    //checkink pattern of password
     private function checkPass($i_pass)
     {
         //Must contain 8 chars, at least one letter, at least one number
@@ -74,6 +78,7 @@ class SettingsFragmentController extends MainController
         return preg_match($pattern,$i_pass);
     }
 
+    //handles edit warehouse page
     public function editWarehouse()
     {
         if(!LoginController::isAdmin())
@@ -116,7 +121,7 @@ class SettingsFragmentController extends MainController
         $this->show();
     }
 
-
+    //handles post request for edit and add warehouse fragments
     public function submitWarehouse()
     {
         if(!LoginController::isAdmin())
@@ -174,6 +179,7 @@ class SettingsFragmentController extends MainController
         $this->show();
     }
 
+    //handling edit user page 
     public function editUser()
     {
         if(!LoginController::isAdmin())
@@ -213,6 +219,7 @@ class SettingsFragmentController extends MainController
         $this->show();
     }
 
+    //handling current user editing -> post req from settings fragment
     public function editCurrentUser()
     {
         //editing currently logged in user's own account

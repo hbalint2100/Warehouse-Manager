@@ -1,5 +1,6 @@
 <?php
 
+//handles connection to database, with singleton pattern
 declare(strict_types=1);
 class DB
 {

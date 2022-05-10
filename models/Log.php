@@ -39,6 +39,22 @@ class Log
         $this->logId = (int) $db->lastInsertId();
     }
 
+    public static function deleteOldLogs()
+    {
+        $db = DB::getInstance();
+        try
+        {
+            $query = $db->prepare('DELETE FROM '.self::LOGTABLE.' WHERE TIMESTAMPDIFF(DAY,'.self::TIME.',CURRENT_TIMESTAMP()) > 60;');
+            $query->execute();
+            return $query->rowCount();
+        }
+        catch(PDOException $e)
+        {
+            echo $e->getMessage();
+            return 0;
+        }
+    }
+
     public static function getNth100Logs(int $N)
     {
         $db = DB::getInstance();

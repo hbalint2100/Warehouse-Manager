@@ -45,6 +45,9 @@
                 <li class="page-item"><button class="btn" onclick="previous()">Previous</button></li>
                 <li class="page-item"><button class="btn" onclick="next()">Next</a></li>
                 <li class="page-item">Page: <?php echo ($this->getFragmentArray()['page_start']?? '').'-'.($this->getFragmentArray()['page_end']?? '')?></li>
+                <li> <input type="text" name="search" form="search" placeholder="Name or item number"> </li>
+                <li><input class="btn btn-primary" type="submit" form="search" value="Search"></li>
+                <form id="search"></form>
             </ul>
         </nav>
         <?php 

@@ -22,6 +22,18 @@
             window.location.href = window.location.href.split('?')[0] + "?page=" + (--(window.location.href.split('?page=')[1]));
         }
     }
+
+    function deleteOldLogs()
+    {
+        if(!window.location.href.includes("?",0))
+        {
+            window.location.href = window.location.href+"?deletelogs=true";
+        }
+        else
+        {
+            window.location.href = window.location.href+"&deletelogs=true";
+        }
+    }
 </script>
 <div class="title">
     <h1><strong><?php echo $this->getFragmentArray()['title']?? ''; ?></strong></h1>
@@ -33,6 +45,7 @@
                 <li class="page-item"><button class="btn" onclick="previous()">Previous</button></li>
                 <li class="page-item"><button class="btn" onclick="next()">Next</a></li>
                 <li class="page-item">Page: <?php echo $this->getFragmentArray()['page_start'].'-'.$this->getFragmentArray()['page_end']?></li>
+                <li><button onclick="deleteOldLogs()" class="btn btn-danger">Delete logs older than 60 days</button></li>
             </ul>
         </nav>
         <table class="table">

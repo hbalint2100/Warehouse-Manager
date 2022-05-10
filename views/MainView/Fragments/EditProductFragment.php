@@ -6,7 +6,10 @@
             });
             window.stocks = <?php echo isset($this->getFragmentArray()['stocks'])? count($this->getFragmentArray()['stocks']) : '1'; ?>;
             document.getElementById("stocks_length").value = window.stocks;
-            document.getElementById("warehouse-1").selectedIndex = 0;
+            if(document.getElementById("warehouse-1")&&<?php echo $this->getFragmentArray()['title'] == 'New product'? 'true' : 'false' ; ?>)
+            {
+                document.getElementById("warehouse-1").selectedIndex = 0;   
+            }
 
         };
 
@@ -31,6 +34,7 @@
 
         function addStock()
         {
+            //check number of warehouses in db
             if(window.stocks==<?php echo $this->getFragmentArray()['warehousecount']?? 1?>)
             {
                 return;
@@ -44,10 +48,11 @@
                                                 }
                                             ?>"+"</select>";
             row.insertCell(1).innerHTML = "<input type=\"number\" min=\"0\" class=\"form-control\" id=\"amount-"+(window.stocks)+"\" name=\"amount-"+(window.stocks)+"\">"
+            <?php echo isset($this->getFragmentArray()['title'])&&$this->getFragmentArray()['title']=='Edit product'? 'row.insertCell(2).innerHTML = "<input type=\"button\" class=\"btn\" value=\"Delete\" onclick=\"deleteWarehouse(this.id)\" id=\"deletewarehouse-\"+(window.stocks)+\"\" name=\"deletewarehouse-"+(window.stocks)+"\">"' : ''; ?>
 
             for (let i = 1; i < <?php echo $this->getFragmentArray()['warehousecount']?? 1?>; i++) 
             {
-                if(("warehouse-"+i)!=("warehouse-"+window.stocks))
+                if(("warehouse-"+i)!=("warehouse-"+window.stocks)&&document.getElementById("warehouse-"+window.stocks)&&document.getElementById("warehouse-"+i))
                 {
                     document.getElementById("warehouse-"+window.stocks).options[document.getElementById("warehouse-"+i).selectedIndex].setAttribute("hidden",true);
                 }
@@ -68,6 +73,15 @@
             {
                 window.location.href = window.location.href+"&delete=true";
             }
+        }
+
+        function deleteWarehouse(clicked_id)
+        {
+            if(!window.location.href.includes("?",0))
+            {
+                window.location.href = window.location.href + "?";
+            }
+            window.location.href = window.location.href+"&deletewarehouse="+document.getElementById("warehouse-"+clicked_id.split("-")[1]).options[document.getElementById("warehouse-"+clicked_id.split("-")[1]).selectedIndex].value;
         }
 </script>
 <div class="title">
@@ -135,7 +149,10 @@
                                                     </td>
                                                     <td>
                                                         <input type="number" min="0" class="form-control" placeholder="'.$stock->getAmount().'" id="amount-'.$i.'" name="amount-'.$i.'">
-                                                    </td>
+                                                    </td>'.(isset($this->getFragmentArray()['title'])&&$this->getFragmentArray()['title']=='Edit product'?'
+                                                    <td>
+                                                        <input type="button" class="btn" onclick="deleteWarehouse(this.id)" id="deletewarehouse-'.$i.'" value="Delete" name="deletewarehouse-'.$i.'">
+                                                    </td>':'').'
                                                 </tr>';
                                         $i++;
                                     }
@@ -156,7 +173,10 @@
                                     </td>
                                     <td>
                                         <input type="number" min="0" class="form-control" id="amount-1" name="amount-1">
-                                    </td>
+                                    </td>'.(isset($this->getFragmentArray()['title'])&&$this->getFragmentArray()['title']=='Edit product'?'
+                                    <td>
+                                        <input type="button" class="btn" id="deletewarehouse-1" onclick="deleteWarehouse(this.id)" value="Delete" name="deletewarehouse-1">
+                                    </td>':'').'
                                 </tr>';
                                 }
                                 ?>

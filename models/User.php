@@ -1,13 +1,14 @@
 <?php
 declare(strict_types=1);
 
+//possible privilege levels of users
 enum PrivilegeLevels
 {
     case ADMIN;
     case USER;
 }
 
-
+//handles queries from user table and user object creations
 class User
 {
     private int $userId;
@@ -66,6 +67,7 @@ class User
         return null;
     }
 
+    //inserting user to Db
     public static function registerUser(string $i_username,string $i_password,?PrivilegeLevels $i_privilegeLevel)
     {
         if(is_null($i_username)||is_null($i_password)||is_null($i_privilegeLevel))
@@ -161,7 +163,7 @@ class User
         return null;
     }
 
-
+    //updating object's parameters in db
     public function updateUserInDB()
     {
         if(!is_null($this->userId))
@@ -225,7 +227,7 @@ class User
         $this->privilegeLevel = $i_privilegeLevel;
     }
 
-
+    //conversion between string and enum
     public static function privilige2Str(PrivilegeLevels $i_privilegeLevel)
     {
         if($i_privilegeLevel===PrivilegeLevels::ADMIN)
@@ -239,6 +241,7 @@ class User
         return null;
     }
 
+    //conversion between string and enum
     public static function str2Privilige(string $i_privilegeLevel)
     {
         if(is_string($i_privilegeLevel))

@@ -1,5 +1,5 @@
 <?php
-
+//parent of every controller -> handles title, bodypath, description, stylesheet, favicon, request path
 declare(strict_types=1);
 class BaseController
 {

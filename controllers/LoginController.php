@@ -1,12 +1,15 @@
 <?php
 
+//controller for loginview -> handles login and authentication of users
 declare(strict_types=1);
 class LoginController extends BaseController
 {
+    //constants for session variables 
     public const KEY_LOGINSUCCESS = 'loginSuccess';
     public const KEY_USERID = 'userID';
     private const KEY_ADMIN = 'admin';
 
+    //displays login success on login screen
     public function getLoginSuccess()
     {
         //Didn't try to login yet
@@ -17,6 +20,7 @@ class LoginController extends BaseController
         return $_SESSION[self::KEY_LOGINSUCCESS]? 'Successful sign-in!':'Unsuccessful sign-in!';
     }
 
+    //displays login screen
     public function index()
     {
         if(self::loggedIn())
@@ -30,6 +34,7 @@ class LoginController extends BaseController
         $this->show();
     }
 
+    //handling login
     public function login()
     {
         //be careful with the user typed data -> restrict it
@@ -55,6 +60,7 @@ class LoginController extends BaseController
         }
     }
 
+    //handling logout
     public function logout()
     {
         if(self::loggedIn())
@@ -66,11 +72,13 @@ class LoginController extends BaseController
         exit;
     }
 
+    //decides whether current user is admin
     public static function isAdmin()
     {
         return $_SESSION[self::KEY_ADMIN]?? false;
     }
 
+    //updating current users privilige level from db in case of privilige level change
     public static function updateSessionUser()
     {
         $user = User::getUserByID(self::getUserID());
@@ -82,11 +90,13 @@ class LoginController extends BaseController
         return true;
     }
 
+    //current users userid
     public static function getUserID()
     {
         return $_SESSION[self::KEY_USERID]?? null;
     }
 
+    //checks if current user is logged in
     public static function loggedIn()
     {
         return isset($_SESSION[self::KEY_LOGINSUCCESS])&&isset($_SESSION[self::KEY_USERID])&&$_SESSION[LoginController::KEY_LOGINSUCCESS]==true;
