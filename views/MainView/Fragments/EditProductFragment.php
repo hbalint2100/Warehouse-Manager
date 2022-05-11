@@ -97,11 +97,11 @@
                 <div class="form-group row">
                     <label for="itemnumber" class="col-sm-2 col-form-label">Item number</label>
                     <div class="col-sm-2">
-                    <input type="text" class="form-control" id="itemnumber" name="itemnumber" placeholder="<?php echo isset($this->getFragmentArray()['itemnumber']) ? $this->getFragmentArray()['itemnumber'] : 'Item number' ;?>">
+                    <input type="text" class="form-control" id="itemnumber" name="itemnumber" <?php echo isset($this->getFragmentArray()['title'])&&$this->getFragmentArray()['title']=='New product' ? 'required' : ''; ?> placeholder="<?php echo isset($this->getFragmentArray()['itemnumber']) ? $this->getFragmentArray()['itemnumber'] : 'Item number' ;?>">
                     </div>
                     <label for="productname" class="col-sm-1 col-form-label">Name</label>
                     <div class="col-sm-6">
-                    <input type="text" class="form-control" id="productname" name="productname" placeholder="<?php echo isset($this->getFragmentArray()['productname']) ? $this->getFragmentArray()['productname'] : 'Name' ;?>">
+                    <input type="text" class="form-control" id="productname" name="productname" <?php echo isset($this->getFragmentArray()['title'])&&$this->getFragmentArray()['title']=='New product' ? 'required' : ''; ?> placeholder="<?php echo isset($this->getFragmentArray()['productname']) ? $this->getFragmentArray()['productname'] : 'Name' ;?>">
                     </div>
                 </div>
                 <div class="form-group row">
@@ -113,7 +113,7 @@
                 <div class="form-group row">
                     <label for="netprice" class="col-sm-2 col-form-label">Net price</label>
                     <div class="col-sm-3">
-                    <input type="number" min="0" class="form-control" id="netprice" name="netprice" placeholder="<?php echo isset($this->getFragmentArray()['netprice']) ? $this->getFragmentArray()['netprice'] : 'Net price' ;?>">
+                    <input type="number" min="0" class="form-control" id="netprice" name="netprice" <?php echo isset($this->getFragmentArray()['title'])&&$this->getFragmentArray()['title']=='New product' ? 'required' : ''; ?> placeholder="<?php echo isset($this->getFragmentArray()['netprice']) ? $this->getFragmentArray()['netprice'] : 'Net price' ;?>">
                     </div>
                     <label for="grossprice" class="col-sm-2 col-form-label">Gross price</label>
                     <div class="col-sm-3">
