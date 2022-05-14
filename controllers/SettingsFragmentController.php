@@ -139,10 +139,14 @@ class SettingsFragmentController extends MainController
             {
                 $details = $_POST['details'];
             }
-            if(Warehouse::addWarehouse2DB(htmlspecialchars($_POST['warehousename']),htmlspecialchars($details)))
+            if($_POST['warehousename']!=''&&Warehouse::addWarehouse2DB(htmlspecialchars($_POST['warehousename']),htmlspecialchars($details)))
             {
                 (new Log("New warehouse: ".htmlspecialchars($_POST['warehousename']),LoginController::getUserID()))->save();
                 echo '<script>alert("Warehouse successfully added"); window.location = "/warehouse/settings";</script>';
+            }
+            else
+            {
+                echo '<script>alert("Warehouse could not be added"); window.location = "/warehouse/settings";</script>';
             }
         }
         else if($this->getPath()=='/warehouse/settings/edit_warehouse'&&isset($_GET['warehouseid'])&&isset($_POST['warehousename']))
@@ -290,13 +294,21 @@ class SettingsFragmentController extends MainController
         $this->setDescription('Submit user subpage of settings');
         $this->setUpMainView();
         $this->setFragmentPath(parent::VIEWS.'\MainView\Fragments\EditUserFragment.php');
+        if($this->getPath()=='/warehouse/settings/add_user')
+        {
+            $this->fragmentArray['title'] = "New user";
+        }
+        if($this->getPath()=='/warehouse/settings/edit_user')
+        {
+            $this->fragmentArray['title'] = "Edit user";
+        }
 
         //check validity write to UI
-        if(isset($_POST['username'])&&$_POST['username']!="")
+        if(isset($_POST['username']))
         {
             $this->fragmentArray['validusername'] = $this->checkUsername($_POST['username']);
         }
-        if(isset($_POST['password'])&&$_POST['password']!="")
+        if(isset($_POST['password']))
         {
             $this->fragmentArray['validpassword'] = $this->checkPass($_POST['password']);
         }
